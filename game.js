@@ -4,13 +4,16 @@ let gameState = {
     discardPile: [],
     playerHand: [],
     aiHand: [],
-    currentTurn: 'player', // 'player' or 'ai'
+    currentTurn: 'player', // 'player' or 'ai' (or 'player2' for multiplayer)
     direction: 1, // 1 for clockwise, -1 for counter-clockwise
     currentColor: null,
     currentValue: null,
     gameActive: false,
     mustDrawCards: 0,
-    playerCalledUno: false
+    playerCalledUno: false,
+    difficulty: 2, // 1 = Easy, 2 = Medium, 3 = Hard
+    gameMode: 'ai', // 'ai' or 'multiplayer'
+    player2CalledUno: false
 };
 
 // Card colors and values
@@ -18,12 +21,90 @@ const colors = ['red', 'blue', 'green', 'yellow'];
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'skip', 'reverse', 'draw2'];
 const wildCards = ['wild', 'wild4'];
 
+// User Management
+let currentUser = null;
+
+// Simple hash function for passwords (not secure, but functional for demo)
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString();
+}
+
+// Get users from localStorage
+function getUsers() {
+    const users = localStorage.getItem('uno_users');
+    return users ? JSON.parse(users) : {};
+}
+
+// Save users to localStorage
+function saveUsers(users) {
+    localStorage.setItem('uno_users', JSON.stringify(users));
+}
+
+// Register new user
+function registerUser(username, password) {
+    const users = getUsers();
+    
+    if (users[username]) {
+        return { success: false, message: 'Username already exists' };
+    }
+    
+    users[username] = {
+        password: simpleHash(password),
+        wins: 0,
+        losses: 0
+    };
+    
+    saveUsers(users);
+    return { success: true, message: 'Account created successfully' };
+}
+
+// Login user
+function loginUser(username, password) {
+    const users = getUsers();
+    
+    if (!users[username]) {
+        return { success: false, message: 'User not found' };
+    }
+    
+    if (users[username].password !== simpleHash(password)) {
+        return { success: false, message: 'Incorrect password' };
+    }
+    
+    currentUser = username;
+    localStorage.setItem('uno_current_user', username);
+    return { success: true, message: 'Login successful' };
+}
+
+// Logout user
+function logoutUser() {
+    currentUser = null;
+    localStorage.removeItem('uno_current_user');
+}
+
+// Check if user is logged in
+function checkLoggedIn() {
+    const savedUser = localStorage.getItem('uno_current_user');
+    if (savedUser) {
+        currentUser = savedUser;
+        return true;
+    }
+    return false;
+}
+
 // DOM Elements
+const loginScreen = document.getElementById('login-screen');
 const menuScreen = document.getElementById('menu-screen');
 const gameScreen = document.getElementById('game-screen');
 const playerCardsEl = document.getElementById('player-cards');
 const opponentCardsEl = document.getElementById('opponent-cards');
-const discardPileEl = document.getElementById('discard-pile');
+const opponentNameEl = document.getElementById('opponent-name');
+
 const drawDeckEl = document.getElementById('draw-deck');
 const gameStatusEl = document.getElementById('game-status');
 const currentTurnDisplay = document.getElementById('current-turn-display');
@@ -87,7 +168,7 @@ function drawCard() {
 // Deal cards
 function dealCards() {
     gameState.playerHand = [];
-    gameState.aiHand = [];
+    gameState.aiHand = []; // This will be player2 in multiplayer
     
     for (let i = 0; i < 7; i++) {
         gameState.playerHand.push(drawCard());
@@ -187,17 +268,28 @@ function drawCards(count, isPlayer) {
 
 // Switch turn
 function switchTurn() {
-    gameState.currentTurn = gameState.currentTurn === 'player' ? 'ai' : 'player';
+    if (gameState.gameMode === 'multiplayer') {
+        // Multiplayer: switch between player and player2
+        gameState.currentTurn = gameState.currentTurn === 'player' ? 'player2' : 'player';
+    } else {
+        // AI mode: switch between player and AI
+        gameState.currentTurn = gameState.currentTurn === 'player' ? 'ai' : 'player';
+    }
+    
     updateTurnDisplay();
     
-    if (gameState.currentTurn === 'ai') {
+    if (gameState.currentTurn === 'ai' && gameState.gameMode === 'ai') {
         setTimeout(aiTurn, 1000);
     }
 }
 
 // Update turn display
 function updateTurnDisplay() {
-    currentTurnDisplay.textContent = gameState.currentTurn === 'player' ? "Your Turn" : "AI's Turn";
+    if (gameState.gameMode === 'multiplayer') {
+        currentTurnDisplay.textContent = gameState.currentTurn === 'player' ? "Player 1's Turn" : "Player 2's Turn";
+    } else {
+        currentTurnDisplay.textContent = gameState.currentTurn === 'player' ? "Your Turn" : "AI's Turn";
+    }
 }
 
 // Update game status
@@ -222,11 +314,26 @@ function renderPlayerHand() {
 // Render opponent's hand
 function renderOpponentHand() {
     opponentCardsEl.innerHTML = '';
-    gameState.aiHand.forEach(() => {
-        const cardEl = document.createElement('div');
-        cardEl.className = 'opponent-card';
-        opponentCardsEl.appendChild(cardEl);
-    });
+    
+    if (gameState.gameMode === 'multiplayer') {
+        // In multiplayer, show player2's cards face up (with a different style)
+        gameState.aiHand.forEach((card, index) => {
+            const cardEl = createCardElement(card, true);
+            cardEl.onclick = () => handlePlayer2CardClick(card);
+            if (canPlayCard(card) && gameState.currentTurn === 'player2') {
+                cardEl.classList.add('playable');
+            }
+            opponentCardsEl.appendChild(cardEl);
+        });
+    } else {
+        // In AI mode, show card backs
+        gameState.aiHand.forEach(() => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'opponent-card';
+            opponentCardsEl.appendChild(cardEl);
+        });
+    }
+    
     opponentCardCount.textContent = `${gameState.aiHand.length} cards`;
 }
 
@@ -306,6 +413,38 @@ function handlePlayerCardClick(card) {
     }
 }
 
+// Handle player 2 card click (multiplayer)
+function handlePlayer2CardClick(card) {
+    if (gameState.currentTurn !== 'player2' || !gameState.gameActive) return;
+    
+    if (!canPlayCard(card)) {
+        updateStatus("Player 2 can't play this card!");
+        return;
+    }
+    
+    // Check UNO call
+    if (gameState.aiHand.length === 2 && !gameState.player2CalledUno) {
+        // Player 2 forgot to call UNO - penalty
+        updateStatus("Player 2 forgot to call UNO! Draw 2 cards!");
+        drawCards(2, false);
+        renderOpponentHand();
+    }
+    
+    gameState.player2CalledUno = false;
+    
+    if (card.type === 'wild') {
+        // Show color selection modal for player 2
+        showColorModalForPlayer2(card);
+    } else {
+        playCard(card, gameState.aiHand, false);
+        renderAll();
+        
+        if (gameState.gameActive) {
+            switchTurn();
+        }
+    }
+}
+
 // Show color selection modal
 function showColorModal(card) {
     colorModal.classList.remove('hidden');
@@ -326,20 +465,54 @@ function showColorModal(card) {
     });
 }
 
+// Show color selection modal for player 2
+function showColorModalForPlayer2(card) {
+    colorModal.classList.remove('hidden');
+    
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.onclick = () => {
+            const selectedColor = btn.dataset.color;
+            gameState.currentColor = selectedColor;
+            colorModal.classList.add('hidden');
+            
+            playCard(card, gameState.aiHand, false);
+            renderAll();
+            
+            if (gameState.gameActive) {
+                switchTurn();
+            }
+        };
+    });
+}
+
 // Handle draw deck click
 drawDeckEl.onclick = () => {
-    if (gameState.currentTurn !== 'player' || !gameState.gameActive) return;
+    if (!gameState.gameActive) return;
+    
+    // Check if it's the current player's turn (player or player2 in multiplayer)
+    const isPlayerTurn = gameState.currentTurn === 'player';
+    const isPlayer2Turn = gameState.currentTurn === 'player2';
+    
+    if (!isPlayerTurn && !isPlayer2Turn) return;
+    
+    const hand = isPlayerTurn ? gameState.playerHand : gameState.aiHand;
+    const playerName = isPlayerTurn ? 'You' : 'Player 2';
     
     const drawnCard = drawCard();
     if (drawnCard) {
-        gameState.playerHand.push(drawnCard);
-        renderPlayerHand();
+        hand.push(drawnCard);
+        
+        if (isPlayerTurn) {
+            renderPlayerHand();
+        } else {
+            renderOpponentHand();
+        }
         
         // Check if drawn card can be played
         if (canPlayCard(drawnCard)) {
-            updateStatus("You drew a playable card!");
+            updateStatus(`${playerName} drew a playable card!`);
         } else {
-            updateStatus("You drew a card. Pass turn.");
+            updateStatus(`${playerName} drew a card. Pass turn.`);
             setTimeout(switchTurn, 1000);
         }
     }
@@ -361,25 +534,66 @@ function aiTurn() {
     const playableCards = gameState.aiHand.filter(card => canPlayCard(card));
     
     if (playableCards.length > 0) {
-        // AI strategy: prioritize action cards, then match color, then wild cards
-        playableCards.sort((a, b) => {
-            if (a.type === 'wild' && b.type !== 'wild') return 1;
-            if (a.type !== 'wild' && b.type === 'wild') return -1;
-            if (a.type === 'action' && b.type !== 'action') return -1;
-            if (a.type !== 'action' && b.type === 'action') return 1;
-            return 0;
-        });
+        let cardToPlay;
         
-        const cardToPlay = playableCards[0];
+        // Different strategies based on difficulty
+        if (gameState.difficulty === 1) {
+            // Easy: Random choice
+            cardToPlay = playableCards[Math.floor(Math.random() * playableCards.length)];
+        } else if (gameState.difficulty === 2) {
+            // Medium: Prioritize action cards, then match color, then wild cards
+            playableCards.sort((a, b) => {
+                if (a.type === 'wild' && b.type !== 'wild') return 1;
+                if (a.type !== 'wild' && b.type === 'wild') return -1;
+                if (a.type === 'action' && b.type !== 'action') return -1;
+                if (a.type !== 'action' && b.type === 'action') return 1;
+                return 0;
+            });
+            cardToPlay = playableCards[0];
+        } else {
+            // Hard: Optimal strategy - save wild cards for emergencies, use action cards strategically
+            playableCards.sort((a, b) => {
+                // Prioritize action cards that hurt player
+                if (a.value === 'wild4' && b.value !== 'wild4') return 1;
+                if (a.value !== 'wild4' && b.value === 'wild4') return -1;
+                if (a.value === 'draw2' && b.value !== 'draw2') return -1;
+                if (a.value !== 'draw2' && b.value === 'draw2') return 1;
+                if (a.value === 'skip' && b.value !== 'skip') return -1;
+                if (a.value !== 'skip' && b.value === 'skip') return 1;
+                // Match color to keep options open
+                if (a.color === gameState.currentColor && b.color !== gameState.currentColor) return -1;
+                if (a.color !== gameState.currentColor && b.color === gameState.currentColor) return 1;
+                // Save wild cards
+                if (a.type === 'wild' && b.type !== 'wild') return 1;
+                if (a.type !== 'wild' && b.type === 'wild') return -1;
+                return 0;
+            });
+            cardToPlay = playableCards[0];
+        }
         
         if (cardToPlay.type === 'wild') {
-            // AI chooses most common color in hand
-            const colorCounts = { red: 0, blue: 0, green: 0, yellow: 0 };
-            gameState.aiHand.forEach(card => {
-                if (card.color !== 'wild') colorCounts[card.color]++;
-            });
-            const bestColor = Object.entries(colorCounts).sort((a, b) => b[1] - a[1])[0][0];
-            gameState.currentColor = bestColor;
+            // AI chooses color based on difficulty
+            if (gameState.difficulty === 1) {
+                // Easy: Random color
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                gameState.currentColor = randomColor;
+            } else if (gameState.difficulty === 2) {
+                // Medium: Most common color in hand
+                const colorCounts = { red: 0, blue: 0, green: 0, yellow: 0 };
+                gameState.aiHand.forEach(card => {
+                    if (card.color !== 'wild') colorCounts[card.color]++;
+                });
+                const bestColor = Object.entries(colorCounts).sort((a, b) => b[1] - a[1])[0][0];
+                gameState.currentColor = bestColor;
+            } else {
+                // Hard: Choose color AI has most of AND player likely doesn't
+                const colorCounts = { red: 0, blue: 0, green: 0, yellow: 0 };
+                gameState.aiHand.forEach(card => {
+                    if (card.color !== 'wild') colorCounts[card.color]++;
+                });
+                const bestColor = Object.entries(colorCounts).sort((a, b) => b[1] - a[1])[0][0];
+                gameState.currentColor = bestColor;
+            }
         }
         
         playCard(cardToPlay, gameState.aiHand, false);
@@ -387,7 +601,12 @@ function aiTurn() {
         
         // AI calls UNO
         if (gameState.aiHand.length === 1) {
-            updateStatus("AI calls UNO!");
+            // Easy difficulty might forget to call UNO
+            if (gameState.difficulty === 1 && Math.random() > 0.7) {
+                updateStatus("AI forgot to call UNO!");
+            } else {
+                updateStatus("AI calls UNO!");
+            }
         }
         
         if (gameState.gameActive) {
@@ -400,6 +619,15 @@ function aiTurn() {
             gameState.aiHand.push(drawnCard);
             renderOpponentHand();
             updateStatus("AI drew a card");
+            
+            // Hard difficulty: try to play drawn card if possible
+            if (gameState.difficulty === 3 && canPlayCard(drawnCard)) {
+                setTimeout(() => {
+                    if (gameState.currentTurn === 'ai' && gameState.gameActive) {
+                        aiTurn();
+                    }
+                }, 500);
+            }
         }
         
         if (gameState.gameActive) {
@@ -410,9 +638,15 @@ function aiTurn() {
 
 // UNO button click
 unoBtn.onclick = () => {
-    gameState.playerCalledUno = true;
-    unoBtn.classList.add('hidden');
-    updateStatus("UNO!");
+    if (gameState.currentTurn === 'player') {
+        gameState.playerCalledUno = true;
+        unoBtn.classList.add('hidden');
+        updateStatus("Player 1 calls UNO!");
+    } else if (gameState.currentTurn === 'player2' && gameState.gameMode === 'multiplayer') {
+        gameState.player2CalledUno = true;
+        unoBtn.classList.add('hidden');
+        updateStatus("Player 2 calls UNO!");
+    }
 };
 
 // Render all game elements
@@ -431,13 +665,27 @@ function startGame() {
     gameState.gameActive = true;
     gameState.mustDrawCards = 0;
     gameState.playerCalledUno = false;
+    gameState.player2CalledUno = false;
     
     directionDisplay.textContent = '→';
     unoBtn.classList.add('hidden');
     
+    // Update opponent name based on game mode
+    if (gameState.gameMode === 'multiplayer') {
+        opponentNameEl.textContent = '👤 Player 2';
+    } else {
+        opponentNameEl.textContent = '🤖 AI Opponent';
+    }
+    
     renderAll();
     updateTurnDisplay();
-    updateStatus("Game started! Your turn.");
+    
+    if (gameState.gameMode === 'multiplayer') {
+        updateStatus("Game started! Player 1's turn.");
+    } else {
+        const difficultyNames = { 1: 'Easy', 2: 'Medium', 3: 'Hard' };
+        updateStatus(`Game started! Difficulty: ${difficultyNames[gameState.difficulty]}. Your turn.`);
+    }
 }
 
 // End game
@@ -447,12 +695,22 @@ function endGame(playerWon) {
     const winMessage = document.getElementById('win-message');
     const winSubtitle = document.getElementById('win-subtitle');
     
-    if (playerWon) {
-        winMessage.textContent = '🎉 You Win!';
-        winSubtitle.textContent = 'Congratulations!';
+    if (gameState.gameMode === 'multiplayer') {
+        if (playerWon) {
+            winMessage.textContent = '🎉 Player 1 Wins!';
+            winSubtitle.textContent = 'Congratulations!';
+        } else {
+            winMessage.textContent = '🎉 Player 2 Wins!';
+            winSubtitle.textContent = 'Well played!';
+        }
     } else {
-        winMessage.textContent = '😢 AI Wins!';
-        winSubtitle.textContent = 'Better luck next time!';
+        if (playerWon) {
+            winMessage.textContent = '🎉 You Win!';
+            winSubtitle.textContent = 'Congratulations!';
+        } else {
+            winMessage.textContent = '😢 AI Wins!';
+            winSubtitle.textContent = 'Better luck next time!';
+        }
     }
     
     winModal.classList.remove('hidden');
@@ -474,13 +732,17 @@ function backToMenu() {
 
 // Event Listeners
 document.getElementById('play-ai-btn').onclick = () => {
+    gameState.gameMode = 'ai';
     menuScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
     startGame();
 };
 
 document.getElementById('play-multiplayer-btn').onclick = () => {
-    alert('Multiplayer feature coming soon! For now, play against the AI.');
+    gameState.gameMode = 'multiplayer';
+    menuScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    startGame();
 };
 
 document.getElementById('rules-btn').onclick = () => {
@@ -496,6 +758,103 @@ document.getElementById('back-to-menu-btn').onclick = backToMenu;
 document.getElementById('play-again-btn').onclick = resetGame;
 
 document.getElementById('back-to-menu-from-win-btn').onclick = backToMenu;
+
+// Difficulty button event listeners
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+    btn.onclick = () => {
+        // Remove active class from all buttons
+        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        btn.classList.add('active');
+        // Set difficulty
+        gameState.difficulty = parseInt(btn.dataset.difficulty);
+    };
+});
+
+// Set default difficulty (Medium)
+document.querySelector('.difficulty-btn[data-difficulty="2"]').classList.add('active');
+
+// Authentication event listeners
+document.getElementById('show-signup').onclick = (e) => {
+    e.preventDefault();
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('signup-form').classList.remove('hidden');
+};
+
+document.getElementById('show-login').onclick = (e) => {
+    e.preventDefault();
+    document.getElementById('signup-form').classList.add('hidden');
+    document.getElementById('login-form').classList.remove('hidden');
+};
+
+document.getElementById('login-btn').onclick = () => {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!username || !password) {
+        alert('Please enter username and password');
+        return;
+    }
+    
+    const result = loginUser(username, password);
+    
+    if (result.success) {
+        document.getElementById('current-username').textContent = username;
+        loginScreen.classList.add('hidden');
+        menuScreen.classList.remove('hidden');
+    } else {
+        alert(result.message);
+    }
+};
+
+document.getElementById('signup-btn').onclick = () => {
+    const username = document.getElementById('signup-username').value;
+    const password = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+    
+    if (!username || !password || !confirm) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    if (password !== confirm) {
+        alert('Passwords do not match');
+        return;
+    }
+    
+    if (password.length < 4) {
+        alert('Password must be at least 4 characters');
+        return;
+    }
+    
+    const result = registerUser(username, password);
+    
+    if (result.success) {
+        alert(result.message);
+        document.getElementById('signup-form').classList.add('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('signup-username').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('signup-confirm').value = '';
+    } else {
+        alert(result.message);
+    }
+};
+
+document.getElementById('logout-btn').onclick = () => {
+    logoutUser();
+    menuScreen.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+};
+
+// Check if user is already logged in on page load
+if (checkLoggedIn()) {
+    document.getElementById('current-username').textContent = currentUser;
+    loginScreen.classList.add('hidden');
+    menuScreen.classList.remove('hidden');
+}
 
 // Close modals on outside click
 colorModal.onclick = (e) => {
