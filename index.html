@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uno Game - Play Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Menu Screen -->
+    <div id="menu-screen" class="screen">
+        <div class="menu-container">
+            <h1 class="game-title">🎴 UNO</h1>
+            <p class="game-subtitle">The Classic Card Game</p>
+            
+            <div class="menu-buttons">
+                <button id="play-ai-btn" class="menu-btn primary">
+                    <span class="btn-icon">🤖</span>
+                    Play vs AI
+                </button>
+                <button id="play-multiplayer-btn" class="menu-btn secondary">
+                    <span class="btn-icon">👥</span>
+                    Multiplayer
+                </button>
+                <button id="rules-btn" class="menu-btn tertiary">
+                    <span class="btn-icon">📖</span>
+                    How to Play
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen hidden">
+        <div class="game-header">
+            <button id="back-to-menu-btn" class="back-btn">← Menu</button>
+            <div class="game-info">
+                <span id="current-turn-display">Your Turn</span>
+                <span id="direction-display">→</span>
+            </div>
+            <button id="uno-btn" class="uno-btn hidden">UNO!</button>
+        </div>
+
+        <!-- Opponent Area -->
+        <div class="opponent-area">
+            <div class="player-info">
+                <span class="player-name">🤖 AI Opponent</span>
+                <span class="card-count" id="opponent-card-count">7 cards</span>
+            </div>
+            <div class="opponent-cards" id="opponent-cards"></div>
+        </div>
+
+        <!-- Game Center -->
+        <div class="game-center">
+            <div class="deck-area">
+                <div class="deck" id="draw-deck">
+                    <div class="card-back"></div>
+                    <span class="deck-label">Draw</span>
+                </div>
+                <div class="discard-pile" id="discard-pile">
+                    <div class="card-placeholder">Discard</div>
+                </div>
+            </div>
+            <div class="game-status" id="game-status"></div>
+        </div>
+
+        <!-- Player Area -->
+        <div class="player-area">
+            <div class="player-info">
+                <span class="player-name">👤 You</span>
+                <span class="card-count" id="player-card-count">7 cards</span>
+            </div>
+            <div class="player-cards" id="player-cards"></div>
+        </div>
+    </div>
+
+    <!-- Color Selection Modal -->
+    <div id="color-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Choose a Color</h2>
+            <div class="color-options">
+                <button class="color-btn red" data-color="red"></button>
+                <button class="color-btn blue" data-color="blue"></button>
+                <button class="color-btn green" data-color="green"></button>
+                <button class="color-btn yellow" data-color="yellow"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="modal hidden">
+        <div class="modal-content rules-content">
+            <h2>How to Play UNO</h2>
+            <div class="rules-text">
+                <h3>🎯 Objective</h3>
+                <p>Be the first to play all your cards!</p>
+                
+                <h3>🃏 Card Types</h3>
+                <ul>
+                    <li><strong>Number Cards (0-9):</strong> Match by number or color</li>
+                    <li><strong>Skip (🚫):</strong> Skip the next player's turn</li>
+                    <li><strong>Reverse (🔄):</strong> Reverse the direction of play</li>
+                    <li><strong>Draw Two (+2):</strong> Next player draws 2 cards</li>
+                    <li><strong>Wild (🌈):</strong> Play anytime, choose the color</li>
+                    <li><strong>Wild Draw Four (+4):</strong> Choose color, next player draws 4</li>
+                </ul>
+                
+                <h3>🎮 Gameplay</h3>
+                <ul>
+                    <li>Match the top card by color, number, or symbol</li>
+                    <li>Draw a card if you can't play</li>
+                    <li>Shout "UNO!" when you have one card left</li>
+                    <li>First to empty their hand wins!</li>
+                </ul>
+            </div>
+            <button id="close-rules-btn" class="menu-btn primary">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="win-modal" class="modal hidden">
+        <div class="modal-content win-content">
+            <h2 id="win-message">🎉 You Win!</h2>
+            <p id="win-subtitle">Congratulations!</p>
+            <div class="win-buttons">
+                <button id="play-again-btn" class="menu-btn primary">Play Again</button>
+                <button id="back-to-menu-from-win-btn" class="menu-btn secondary">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
