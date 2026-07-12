@@ -1,26 +1,3 @@
-// Game State
-let gameState = {
-    deck: [],
-    discardPile: [],
-    playerHand: [],
-    aiHand: [],
-    currentTurn: 'player', // 'player' or 'ai'
-    direction: 1, // 1 for clockwise, -1 for counter-clockwise
-    currentColor: null,
-    currentValue: null,
-    gameActive: false,
-    mustDrawCards: 0,
-    playerCalledUno: false,
-    difficulty: 2, // 1 = Easy, 2 = Medium, 3 = Hard
-    counterUnoWindow: false,
-    counterUnoTimer: null
-};
-
-// Card colors and values
-const colors = ['red', 'blue', 'green', 'yellow'];
-const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'skip', 'reverse', 'draw2'];
-const wildCards = ['wild', 'wild4'];
-
 // Language translations
 const translations = {
     en: {
@@ -105,7 +82,61 @@ const translations = {
         drawCantPlay: 'Draw a card if you can\'t play',
         shoutUno: 'Shout "UNO!" when you have one card left',
         firstToEmpty: 'First to empty their hand wins!',
-        gotIt: 'Got it!'
+        gotIt: 'Got it!',
+        // Navigation
+        navHome: 'Home',
+        navPlayers: 'Players',
+        navRank: 'Rank',
+        navQuit: 'Quit Game',
+        // Players page
+        playersGallery: '👥 Players Gallery',
+        playersSubtitle: 'Pick your avatar and country, then see all available player icons',
+        chooseAvatar: 'Choose Your Avatar:',
+        pickAvatar: 'Pick an avatar!',
+        chooseCountry: 'Choose Your Country:',
+        pickCountry: 'Pick your country!',
+        // Rank page
+        rankPageTitle: '🏆 Your Rank',
+        rankPageSubtitle: 'Win games to earn trophies and climb the ranks!',
+        // Music & Background
+        musicLabel: '🎵 Music',
+        backgroundLabel: 'Background',
+        bgDefault: 'Night Sky',
+        bgWood: 'Wood Table',
+        bgFelt: 'Casino Felt',
+        bgBeach: 'Beach',
+        bgForest: 'Forest',
+        bgMountains: 'Mountains',
+        bgSpace: 'Deep Space',
+        bgStone: 'Stone',
+        // Game screen
+        currentColorLabel: 'Current Color:',
+        counterUno: 'COUNTER UNO!',
+        // Card type names
+        cardSkip: 'Skip',
+        cardReverse: 'Reverse',
+        cardDrawTwo: 'Draw Two',
+        cardWild: 'Wild',
+        cardWildFour: 'Wild +4',
+        // Game messages
+        youCallUno: 'You call UNO!',
+        cantDrawWithPlayable: "You can't draw when you have a playable card!",
+        drewPlayablePass: 'You drew a playable card! Turn passes.',
+        drewCardPass: 'You drew a card. Turn passes.',
+        aiDrewCards: 'AI drew {n} cards!',
+        aiCallsCounterUno: 'AI calls Counter UNO! You forgot to call UNO! Draw 2 cards!',
+        unoExclamation: 'UNO!',
+        // Win modal
+        winSubtitleTrophies: '+{reward} 🏆 | Total: {total} 🏆 | Rank: {rankIcon} {rankName}',
+        // Rank page content
+        trophies: 'Trophies',
+        progressTo: 'Progress to {icon} {name}',
+        moreTrophiesNeeded: '{n} more trophies needed',
+        maxRankAchieved: '⚡ Maximum rank achieved! You are a legend! ⚡',
+        trophiesPerWin: '🏆 Trophies Per Win',
+        allRanks: '📊 All Ranks',
+        leaderboard: '🏅 Leaderboard',
+        youLabel: '(You)'
     },
     es: {
         gameTitle: 'UNO',
@@ -189,7 +220,22 @@ const translations = {
         drawCantPlay: 'Roba una carta si no puedes jugar',
         shoutUno: '¡Grita "UNO!" cuando te quede una carta',
         firstToEmpty: '¡El primero en vaciar su mano gana!',
-        gotIt: '¡Entendido!'
+        gotIt: '¡Entendido!',
+        navHome: 'Inicio', navPlayers: 'Jugadores', navRank: 'Rango', navQuit: 'Salir del Juego',
+        playersGallery: '👥 Galería de Jugadores', playersSubtitle: 'Elige tu avatar y país, luego ve todos los iconos de jugadores',
+        chooseAvatar: 'Elige tu Avatar:', pickAvatar: '¡Elige un avatar!', chooseCountry: 'Elige tu País:', pickCountry: '¡Elige tu país!',
+        rankPageTitle: '🏆 Tu Rango', rankPageSubtitle: '¡Gana partidos para ganar trofeos y subir de rango!',
+        musicLabel: '🎵 Música', backgroundLabel: 'Fondo',
+        bgDefault: 'Cielo Nocturno', bgWood: 'Mesa de Madera', bgFelt: 'Fieltro de Casino', bgBeach: 'Playa', bgForest: 'Bosque', bgMountains: 'Montañas', bgSpace: 'Espacio Profundo', bgStone: 'Piedra',
+        currentColorLabel: 'Color Actual:', counterUno: '¡CONTRA UNO!',
+        cardSkip: 'Saltar', cardReverse: 'Invertir', cardDrawTwo: 'Robar Dos', cardWild: 'Comodín', cardWildFour: 'Comodín +4',
+        youCallUno: '¡Dices UNO!', cantDrawWithPlayable: '¡No puedes robar cuando tienes una carta jugable!',
+        drewPlayablePass: '¡Robaste una carta jugable! Pasa el turno.', drewCardPass: 'Robaste una carta. Pasa el turno.',
+        aiDrewCards: '¡La IA robó {n} cartas!', aiCallsCounterUno: '¡La IA llama Contra UNO! ¡Olvidaste decir UNO! ¡Roba 2 cartas!', unoExclamation: '¡UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | Total: {total} 🏆 | Rango: {rankIcon} {rankName}',
+        trophies: 'Trofeos', progressTo: 'Progreso a {icon} {name}', moreTrophiesNeeded: '{n} trofeos más necesarios',
+        maxRankAchieved: '⚡ ¡Rango máximo alcanzado! ¡Eres una leyenda! ⚡', trophiesPerWin: '🏆 Trofeos por Victoria',
+        allRanks: '📊 Todos los Rangos', leaderboard: '🏅 Tabla de Clasificación', youLabel: '(Tú)'
     },
     fr: {
         gameTitle: 'UNO',
@@ -273,7 +319,22 @@ const translations = {
         drawCantPlay: 'Piochez une carte si vous ne pouvez pas jouer',
         shoutUno: 'Criez "UNO!" quand il vous reste une carte',
         firstToEmpty: 'Le premier à vider sa main gagne!',
-        gotIt: 'Compris!'
+        gotIt: 'Compris!',
+        navHome: 'Accueil', navPlayers: 'Joueurs', navRank: 'Rang', navQuit: 'Quitter le Jeu',
+        playersGallery: '👥 Galerie des Joueurs', playersSubtitle: 'Choisissez votre avatar et pays, puis voyez toutes les icônes de joueurs',
+        chooseAvatar: 'Choisissez votre Avatar:', pickAvatar: 'Choisissez un avatar!', chooseCountry: 'Choisissez votre Pays:', pickCountry: 'Choisissez votre pays!',
+        rankPageTitle: '🏆 Votre Rang', rankPageSubtitle: 'Gagnez des parties pour gagner des trophées et grimper les rangs!',
+        musicLabel: '🎵 Musique', backgroundLabel: 'Arrière-plan',
+        bgDefault: 'Ciel Nocturne', bgWood: 'Table en Bois', bgFelt: 'Tapis de Casino', bgBeach: 'Plage', bgForest: 'Forêt', bgMountains: 'Montagnes', bgSpace: 'Espace Profond', bgStone: 'Pierre',
+        currentColorLabel: 'Couleur Actuelle:', counterUno: 'CONTRE UNO!',
+        cardSkip: 'Sauter', cardReverse: 'Inverser', cardDrawTwo: 'Piocher Deux', cardWild: 'Joker', cardWildFour: 'Joker +4',
+        youCallUno: 'Vous criez UNO!', cantDrawWithPlayable: 'Vous ne pouvez pas piocher quand vous avez une carte jouable!',
+        drewPlayablePass: 'Vous avez pioché une carte jouable! Tour passé.', drewCardPass: 'Vous avez pioché une carte. Tour passé.',
+        aiDrewCards: 'L\'IA a pioché {n} cartes!', aiCallsCounterUno: 'L\'IA appelle Contre UNO! Vous avez oublié de dire UNO! Piochez 2 cartes!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | Total: {total} 🏆 | Rang: {rankIcon} {rankName}',
+        trophies: 'Trophées', progressTo: 'Progression vers {icon} {name}', moreTrophiesNeeded: '{n} trophées de plus nécessaires',
+        maxRankAchieved: '⚡ Rang maximum atteint! Vous êtes une légende! ⚡', trophiesPerWin: '🏆 Trophées par Victoire',
+        allRanks: '📊 Tous les Rangs', leaderboard: '🏅 Classement', youLabel: '(Vous)'
     },
     de: {
         gameTitle: 'UNO',
@@ -357,7 +418,22 @@ const translations = {
         drawCantPlay: 'Karte ziehen, wenn Sie nicht spielen können',
         shoutUno: 'Rufen Sie "UNO!", wenn Sie noch eine Karte haben',
         firstToEmpty: 'Wer zuerst keine Karten mehr hat, gewinnt!',
-        gotIt: 'Verstanden!'
+        gotIt: 'Verstanden!',
+        navHome: 'Startseite', navPlayers: 'Spieler', navRank: 'Rang', navQuit: 'Spiel Verlassen',
+        playersGallery: '👥 Spielergalerie', playersSubtitle: 'Wählen Sie Ihren Avatar und Ihr Land, dann sehen Sie alle verfügbaren Spieler-Icons',
+        chooseAvatar: 'Wählen Sie Ihren Avatar:', pickAvatar: 'Wählen Sie einen Avatar!', chooseCountry: 'Wählen Sie Ihr Land:', pickCountry: 'Wählen Sie Ihr Land!',
+        rankPageTitle: '🏆 Ihr Rang', rankPageSubtitle: 'Gewinnen Sie Spiele, um Trophäen zu sammeln und aufzusteigen!',
+        musicLabel: '🎵 Musik', backgroundLabel: 'Hintergrund',
+        bgDefault: 'Nachthimmel', bgWood: 'Holztisch', bgFelt: 'Casino-Teppich', bgBeach: 'Strand', bgForest: 'Wald', bgMountains: 'Berge', bgSpace: 'Tiefer Weltraum', bgStone: 'Stein',
+        currentColorLabel: 'Aktuelle Farbe:', counterUno: 'GEGEN UNO!',
+        cardSkip: 'Aussetzen', cardReverse: 'Umkehren', cardDrawTwo: 'Zwei Ziehen', cardWild: 'Joker', cardWildFour: 'Joker +4',
+        youCallUno: 'Sie rufen UNO!', cantDrawWithPlayable: 'Sie können nicht ziehen, wenn Sie eine spielbare Karte haben!',
+        drewPlayablePass: 'Sie haben eine spielbare Karte gezogen! Zug vorbei.', drewCardPass: 'Sie haben eine Karte gezogen. Zug vorbei.',
+        aiDrewCards: 'Die KI zog {n} Karten!', aiCallsCounterUno: 'Die KI ruft Gegen UNO! Sie haben vergessen, UNO zu rufen! Ziehen Sie 2 Karten!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | Gesamt: {total} 🏆 | Rang: {rankIcon} {rankName}',
+        trophies: 'Trophäen', progressTo: 'Fortschritt zu {icon} {name}', moreTrophiesNeeded: '{n} weitere Trophäen nötig',
+        maxRankAchieved: '⚡ Maximaler Rang erreicht! Sie sind eine Legende! ⚡', trophiesPerWin: '🏆 Trophäen pro Sieg',
+        allRanks: '📊 Alle Ränge', leaderboard: '🏅 Bestenliste', youLabel: '(Sie)'
     },
     it: {
         gameTitle: 'UNO',
@@ -441,7 +517,22 @@ const translations = {
         drawCantPlay: 'Pesca una carta se non puoi giocare',
         shoutUno: 'Urca "UNO!" quando ti rimane una carta',
         firstToEmpty: 'Il primo a svuotare la mano vince!',
-        gotIt: 'Capito!'
+        gotIt: 'Capito!',
+        navHome: 'Home', navPlayers: 'Giocatori', navRank: 'Rango', navQuit: 'Esci dal Gioco',
+        playersGallery: '👥 Galleria Giocatori', playersSubtitle: 'Scegli il tuo avatar e paese, poi vedi tutte le icone dei giocatori',
+        chooseAvatar: 'Scegli il tuo Avatar:', pickAvatar: 'Scegli un avatar!', chooseCountry: 'Scegli il tuo Paese:', pickCountry: 'Scegli il tuo paese!',
+        rankPageTitle: '🏆 Il tuo Rango', rankPageSubtitle: 'Vinci partite per guadagnare trofei e salire di rango!',
+        musicLabel: '🎵 Musica', backgroundLabel: 'Sfondo',
+        bgDefault: 'Cielo Notturno', bgWood: 'Tavolo di Legno', bgFelt: 'Tappeto da Casino', bgBeach: 'Spiaggia', bgForest: 'Foresta', bgMountains: 'Montagne', bgSpace: 'Spazio Profondo', bgStone: 'Pietra',
+        currentColorLabel: 'Colore Attuale:', counterUno: 'CONTRO UNO!',
+        cardSkip: 'Salta', cardReverse: 'Inverti', cardDrawTwo: 'Pesca Due', cardWild: 'Jolly', cardWildFour: 'Jolly +4',
+        youCallUno: 'Dici UNO!', cantDrawWithPlayable: 'Non puoi pescare quando hai una carta giocabile!',
+        drewPlayablePass: 'Hai pescato una carta giocabile! Turno passato.', drewCardPass: 'Hai pescato una carta. Turno passato.',
+        aiDrewCards: 'L\'IA ha pescato {n} carte!', aiCallsCounterUno: 'L\'IA chiama Contro UNO! Hai dimenticato di dire UNO! Pesca 2 carte!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | Totale: {total} 🏆 | Rango: {rankIcon} {rankName}',
+        trophies: 'Trofei', progressTo: 'Progresso a {icon} {name}', moreTrophiesNeeded: '{n} trofei ancora necessari',
+        maxRankAchieved: '⚡ Rango massimo raggiunto! Sei una leggenda! ⚡', trophiesPerWin: '🏆 Trofei per Vittoria',
+        allRanks: '📊 Tutti i Ranghi', leaderboard: '🏅 Classifica', youLabel: '(Tu)'
     },
     pt: {
         gameTitle: 'UNO',
@@ -525,7 +616,22 @@ const translations = {
         drawCantPlay: 'Compre uma carta se não puder jogar',
         shoutUno: 'Grite "UNO!" quando tiver uma carta restante',
         firstToEmpty: 'O primeiro a esvaziar a mão vence!',
-        gotIt: 'Entendido!'
+        gotIt: 'Entendido!',
+        navHome: 'Início', navPlayers: 'Jogadores', navRank: 'Rango', navQuit: 'Sair do Jogo',
+        playersGallery: '👥 Galeria de Jogadores', playersSubtitle: 'Escolha seu avatar e país, depois veja todos os ícones de jogadores',
+        chooseAvatar: 'Escolha seu Avatar:', pickAvatar: 'Escolha um avatar!', chooseCountry: 'Escolha seu País:', pickCountry: 'Escolha seu país!',
+        rankPageTitle: '🏆 Seu Rango', rankPageSubtitle: 'Vença partidas para ganhar troféus e subir de rank!',
+        musicLabel: '🎵 Música', backgroundLabel: 'Fundo',
+        bgDefault: 'Céu Noturno', bgWood: 'Mesa de Madeira', bgFelt: 'Feltro de Casino', bgBeach: 'Praia', bgForest: 'Floresta', bgMountains: 'Montanhas', bgSpace: 'Espaço Profundo', bgStone: 'Pedra',
+        currentColorLabel: 'Cor Atual:', counterUno: 'CONTRA UNO!',
+        cardSkip: 'Pular', cardReverse: 'Inverter', cardDrawTwo: 'Comprar Dois', cardWild: 'Curinga', cardWildFour: 'Curinga +4',
+        youCallUno: 'Você chama UNO!', cantDrawWithPlayable: 'Você não pode comprar quando tem uma carta jogável!',
+        drewPlayablePass: 'Você comprou uma carta jogável! Turno passado.', drewCardPass: 'Você comprou uma carta. Turno passado.',
+        aiDrewCards: 'A IA comprou {n} cartas!', aiCallsCounterUno: 'A IA chama Contra UNO! Você esqueceu de dizer UNO! Compre 2 cartas!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | Total: {total} 🏆 | Rank: {rankIcon} {rankName}',
+        trophies: 'Troféus', progressTo: 'Progresso para {icon} {name}', moreTrophiesNeeded: '{n} troféus mais necessários',
+        maxRankAchieved: '⚡ Rank máximo alcançado! Você é uma lenda! ⚡', trophiesPerWin: '🏆 Troféus por Vitória',
+        allRanks: '📊 Todos os Ranks', leaderboard: '🏅 Ranking', youLabel: '(Você)'
     },
     zh: {
         gameTitle: 'UNO',
@@ -609,7 +715,22 @@ const translations = {
         drawCantPlay: '不能出牌时抽一张',
         shoutUno: '剩一张牌时喊"UNO!"',
         firstToEmpty: '第一个出完牌的获胜!',
-        gotIt: '明白了!'
+        gotIt: '明白了!',
+        navHome: '首页', navPlayers: '玩家', navRank: '排名', navQuit: '退出游戏',
+        playersGallery: '👥 玩家画廊', playersSubtitle: '选择你的头像和国家，然后查看所有可用的玩家图标',
+        chooseAvatar: '选择你的头像:', pickAvatar: '选一个头像!', chooseCountry: '选择你的国家:', pickCountry: '选你的国家!',
+        rankPageTitle: '🏆 你的排名', rankPageSubtitle: '赢得比赛获得奖杯，提升排名!',
+        musicLabel: '🎵 音乐', backgroundLabel: '背景',
+        bgDefault: '夜空', bgWood: '木桌', bgFelt: '赌场绒布', bgBeach: '海滩', bgForest: '森林', bgMountains: '山脉', bgSpace: '深空', bgStone: '石头',
+        currentColorLabel: '当前颜色:', counterUno: '反击UNO!',
+        cardSkip: '跳过', cardReverse: '反转', cardDrawTwo: '抽两张', cardWild: '万能牌', cardWildFour: '万能+4',
+        youCallUno: '你喊UNO!', cantDrawWithPlayable: '你有可出的牌时不能抽牌!',
+        drewPlayablePass: '你抽到了可出的牌! 跳过回合。', drewCardPass: '你抽了一张牌。跳过回合。',
+        aiDrewCards: 'AI抽了{n}张牌!', aiCallsCounterUno: 'AI喊反击UNO! 你忘了喊UNO! 抽2张牌!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | 总计: {total} 🏆 | 排名: {rankIcon} {rankName}',
+        trophies: '奖杯', progressTo: '进度到 {icon} {name}', moreTrophiesNeeded: '还需{n}个奖杯',
+        maxRankAchieved: '⚡ 已达最高排名! 你是传奇! ⚡', trophiesPerWin: '🏆 每胜奖杯',
+        allRanks: '📊 所有排名', leaderboard: '🏅 排行榜', youLabel: '(你)'
     },
     ja: {
         gameTitle: 'UNO',
@@ -693,7 +814,22 @@ const translations = {
         drawCantPlay: '出せない場合はカードを引く',
         shoutUno: '残り1枚になったら「UNO」と叫ぶ',
         firstToEmpty: '最初に手札を空にした人が勝ち!',
-        gotIt: 'わかりました!'
+        gotIt: 'わかりました!',
+        navHome: 'ホーム', navPlayers: 'プレイヤー', navRank: 'ランク', navQuit: 'ゲーム終了',
+        playersGallery: '👥 プレイヤーギャラリー', playersSubtitle: 'アバターと国を選択し、利用可能なプレイヤーアイコンを確認',
+        chooseAvatar: 'アバターを選択:', pickAvatar: 'アバターを選んで!', chooseCountry: '国を選択:', pickCountry: '国を選んで!',
+        rankPageTitle: '🏆 あなたのランク', rankPageSubtitle: 'ゲームに勝ってトロフィーを獲得し、ランクを上げよう!',
+        musicLabel: '🎵 音楽', backgroundLabel: '背景',
+        bgDefault: '夜空', bgWood: '木のテーブル', bgFelt: 'カジノフェルト', bgBeach: 'ビーチ', bgForest: '森', bgMountains: '山', bgSpace: '深宇宙', bgStone: '石',
+        currentColorLabel: '現在の色:', counterUno: 'カウンターUNO!',
+        cardSkip: 'スキップ', cardReverse: 'リバース', cardDrawTwo: 'ドロー2', cardWild: 'ワイルド', cardWildFour: 'ワイルド+4',
+        youCallUno: 'あなたがUNO!', cantDrawWithPlayable: '出せるカードがある場合は引けません!',
+        drewPlayablePass: '出せるカードを引きました! ターン終了。', drewCardPass: 'カードを引きました。ターン終了。',
+        aiDrewCards: 'AIは{n}枚引きました!', aiCallsCounterUno: 'AIがカウンターUNO! UNOを忘れました! 2枚引いて!', unoExclamation: 'UNO!',
+        winSubtitleTrophies: '+{reward} 🏆 | 合計: {total} 🏆 | ランク: {rankIcon} {rankName}',
+        trophies: 'トロフィー', progressTo: '{icon} {name}への進捗', moreTrophiesNeeded: 'あと{n}トロフィー必要',
+        maxRankAchieved: '⚡ 最高ランク到達! あなたは伝説! ⚡', trophiesPerWin: '🏆 勝利ごとのトロフィー',
+        allRanks: '📊 全ランク', leaderboard: '🏅 リーダーボード', youLabel: '(あなた)'
     },
     ko: {
         gameTitle: 'UNO',
@@ -865,763 +1001,3 @@ const translations = {
     }
 };
 
-let currentLanguage = 'en';
-
-// Function to get translation
-function t(key) {
-    return translations[currentLanguage][key] || translations['en'][key] || key;
-}
-
-// Function to switch language
-function switchLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('uno_language', lang);
-    updateAllText();
-}
-
-// Function to update all text on the page
-function updateAllText() {
-    // Update menu screen text
-    document.querySelector('.game-title').textContent = t('gameTitle');
-    document.querySelector('.game-subtitle').textContent = t('gameSubtitle');
-    
-    // Update buttons
-    document.querySelector('#play-ai-btn .btn-icon').nextSibling.textContent = ' ' + t('playVsAI');
-    document.querySelector('#play-multiplayer-btn .btn-icon').nextSibling.textContent = ' ' + t('localMultiplayer');
-    document.querySelector('#rules-btn .btn-icon').nextSibling.textContent = ' ' + t('howToPlay');
-    
-    // Update difficulty section
-    document.querySelector('.difficulty-label').textContent = t('selectDifficulty');
-    document.querySelector('.difficulty-btn[data-difficulty="1"]').textContent = t('easy');
-    document.querySelector('.difficulty-btn[data-difficulty="2"]').textContent = t('medium');
-    document.querySelector('.difficulty-btn[data-difficulty="3"]').textContent = t('hard');
-    
-    // Update language section
-    document.querySelector('.language-label').textContent = t('language');
-    
-    // Update game screen elements
-    document.querySelector('#back-to-menu-btn').textContent = '← ' + t('menu');
-    document.querySelector('#uno-btn').textContent = t('uno');
-    document.querySelector('#opponent-name').textContent = '🤖 ' + t('aiOpponent');
-    document.querySelector('.player-name').textContent = '👤 ' + t('you');
-    document.querySelector('#draw-deck .deck-label').textContent = t('draw');
-    document.querySelector('#discard-pile .card-placeholder').textContent = t('discard');
-    
-    // Update modals
-    document.querySelector('#color-modal h2').textContent = t('chooseColor');
-    document.querySelector('#rules-modal h2').textContent = t('howToPlay');
-    document.querySelector('#close-rules-btn').textContent = t('gotIt');
-    document.querySelector('#play-again-btn').textContent = t('playAgain');
-    document.querySelector('#back-to-menu-from-win-btn').textContent = t('mainMenu');
-    
-    // Update rules content
-    updateRulesContent();
-    
-    // Update turn display if game is active
-    if (gameState.gameActive) {
-        updateTurnDisplay();
-    }
-}
-
-// Function to update rules content
-function updateRulesContent() {
-    const rulesText = document.querySelector('.rules-text');
-    if (!rulesText) return;
-    
-    rulesText.innerHTML = `
-        <h3>🎯 ${t('objective')}</h3>
-        <p>${t('beFirst')}</p>
-        
-        <h3>🃏 ${t('cardTypes')}</h3>
-        <ul>
-            <li><strong>${t('numberCards')}</strong></li>
-            <li><strong>${t('skip')}</strong></li>
-            <li><strong>${t('reverse')}</strong></li>
-            <li><strong>${t('drawTwo')}</strong></li>
-            <li><strong>${t('wild')}</strong></li>
-            <li><strong>${t('wildFour')}</strong></li>
-        </ul>
-        
-        <h3>🎮 ${t('gameplay')}</h3>
-        <ul>
-            <li>${t('matchCard')}</li>
-            <li>${t('drawCantPlay')}</li>
-            <li>${t('shoutUno')}</li>
-            <li>${t('firstToEmpty')}</li>
-        </ul>
-    `;
-}
-
-// DOM Elements
-const menuScreen = document.getElementById('menu-screen');
-const gameScreen = document.getElementById('game-screen');
-const playerCardsEl = document.getElementById('player-cards');
-const opponentCardsEl = document.getElementById('opponent-cards');
-const opponentNameEl = document.getElementById('opponent-name');
-
-const drawDeckEl = document.getElementById('draw-deck');
-const discardPileEl = document.getElementById('discard-pile');
-const gameStatusEl = document.getElementById('game-status');
-const currentTurnDisplay = document.getElementById('current-turn-display');
-const directionDisplay = document.getElementById('direction-display');
-const playerCardCount = document.getElementById('player-card-count');
-const opponentCardCount = document.getElementById('opponent-card-count');
-const unoBtn = document.getElementById('uno-btn');
-const counterUnoBtn = document.getElementById('counter-uno-btn');
-const colorDisplay = document.getElementById('color-display');
-const colorModal = document.getElementById('color-modal');
-const rulesModal = document.getElementById('rules-modal');
-const winModal = document.getElementById('win-modal');
-
-// Initialize deck
-function createDeck() {
-    const deck = [];
-    
-    // Add number cards and action cards
-    colors.forEach(color => {
-        // One 0 card per color
-        deck.push({ color, value: '0', type: 'number' });
-        
-        // Two of each 1-9 and action cards
-        for (let i = 1; i < values.length; i++) {
-            deck.push({ color, value: values[i], type: values[i] === 'skip' || values[i] === 'reverse' || values[i] === 'draw2' ? 'action' : 'number' });
-            deck.push({ color, value: values[i], type: values[i] === 'skip' || values[i] === 'reverse' || values[i] === 'draw2' ? 'action' : 'number' });
-        }
-    });
-    
-    // Add wild cards (4 of each)
-    for (let i = 0; i < 4; i++) {
-        deck.push({ color: 'wild', value: 'wild', type: 'wild' });
-        deck.push({ color: 'wild', value: 'wild4', type: 'wild' });
-    }
-    
-    return shuffleDeck(deck);
-}
-
-// Shuffle deck
-function shuffleDeck(deck) {
-    for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-    return deck;
-}
-
-// Draw card from deck
-function drawCard() {
-    if (gameState.deck.length === 0) {
-        // Reshuffle discard pile into deck
-        if (gameState.discardPile.length > 1) {
-            const topCard = gameState.discardPile.pop();
-            gameState.deck = shuffleDeck(gameState.discardPile);
-            gameState.discardPile = [topCard];
-        } else {
-            return null; // No cards available
-        }
-    }
-    return gameState.deck.pop();
-}
-
-// Deal cards
-function dealCards() {
-    gameState.playerHand = [];
-    gameState.aiHand = []; // This will be player2 in multiplayer
-    
-    for (let i = 0; i < 7; i++) {
-        gameState.playerHand.push(drawCard());
-        gameState.aiHand.push(drawCard());
-    }
-    
-    // Start discard pile with a number card (not wild)
-    let startCard;
-    do {
-        startCard = drawCard();
-        if (startCard.type === 'wild') {
-            gameState.deck.unshift(startCard);
-            gameState.deck = shuffleDeck(gameState.deck);
-        }
-    } while (startCard.type === 'wild');
-    
-    gameState.discardPile = [startCard];
-    gameState.currentColor = startCard.color;
-    gameState.currentValue = startCard.value;
-}
-
-// Check if card can be played
-function canPlayCard(card) {
-    if (card.type === 'wild') return true;
-    if (card.color === gameState.currentColor) return true;
-    if (card.value === gameState.currentValue) return true;
-    return false;
-}
-
-// Play a card
-function playCard(card, hand, isPlayer) {
-    const cardIndex = hand.findIndex(c => c === card);
-    if (cardIndex === -1) return false;
-    
-    hand.splice(cardIndex, 1);
-    gameState.discardPile.push(card);
-    
-    // Update current color and value
-    if (card.type !== 'wild') {
-        gameState.currentColor = card.color;
-        gameState.currentValue = card.value;
-    }
-    
-    // Handle special cards
-    handleSpecialCard(card, isPlayer);
-    
-    // Check for win
-    if (hand.length === 0) {
-        endGame(isPlayer);
-        return true;
-    }
-    
-    // Show UNO button if player has 1 card
-    if (isPlayer && hand.length === 1) {
-        unoBtn.classList.remove('hidden');
-        // AI will counter UNO after 4 seconds if player doesn't call UNO
-        setTimeout(() => {
-            if (!gameState.playerCalledUno && gameState.gameActive) {
-                updateStatus("AI calls Counter UNO! You forgot to call UNO! Draw 2 cards!");
-                drawCards(2, true);
-                renderPlayerHand();
-            }
-        }, 4000);
-    } else if (!isPlayer && hand.length === 1) {
-        // AI has 1 card, show counter UNO button for player
-        setTimeout(() => {
-            if (gameState.gameActive) {
-                openCounterUnoWindow();
-            }
-        }, 500);
-    } else {
-        unoBtn.classList.add('hidden');
-    }
-    
-    return true;
-}
-
-// Handle special card effects
-function handleSpecialCard(card, isPlayer) {
-    const opponent = isPlayer ? 'ai' : 'player';
-    
-    switch (card.value) {
-        case 'skip':
-            gameState.currentTurn = opponent;
-            updateStatus(`${isPlayer ? 'AI' : 'You'} got skipped!`);
-            break;
-        case 'reverse':
-            gameState.direction *= -1;
-            directionDisplay.textContent = gameState.direction === 1 ? '→' : '←';
-            updateStatus('Direction reversed!');
-            break;
-        case 'draw2':
-            gameState.mustDrawCards = 2;
-            updateStatus(`${isPlayer ? 'AI' : 'You'} must draw 2 cards!`);
-            break;
-        case 'wild4':
-            gameState.mustDrawCards = 4;
-            updateStatus(`${isPlayer ? 'AI' : 'You'} must draw 4 cards!`);
-            break;
-    }
-}
-
-// Draw cards for player
-function drawCards(count, isPlayer) {
-    const hand = isPlayer ? gameState.playerHand : gameState.aiHand;
-    for (let i = 0; i < count; i++) {
-        const card = drawCard();
-        if (card) hand.push(card);
-    }
-    gameState.mustDrawCards = 0;
-}
-
-// Switch turn
-function switchTurn() {
-    gameState.currentTurn = gameState.currentTurn === 'player' ? 'ai' : 'player';
-    
-    updateTurnDisplay();
-    
-    if (gameState.currentTurn === 'ai') {
-        setTimeout(aiTurn, 1000);
-    }
-}
-
-// Update turn display
-function updateTurnDisplay() {
-    currentTurnDisplay.textContent = gameState.currentTurn === 'player' ? t('yourTurn') : t('aiTurn');
-}
-
-// Update game status
-function updateStatus(message) {
-    gameStatusEl.textContent = message;
-}
-
-// Update color display
-function updateColorDisplay() {
-    // Remove all color classes
-    colorDisplay.classList.remove('red', 'blue', 'green', 'yellow');
-    
-    // Add current color class
-    if (gameState.currentColor) {
-        colorDisplay.classList.add(gameState.currentColor);
-    }
-}
-
-// Render player's hand
-function renderPlayerHand() {
-    playerCardsEl.innerHTML = '';
-    
-    gameState.playerHand.forEach((card, index) => {
-        const cardEl = createCardElement(card, true);
-        cardEl.onclick = () => handlePlayerCardClick(card);
-        if (canPlayCard(card) && gameState.currentTurn === 'player') {
-            cardEl.classList.add('playable');
-        }
-        playerCardsEl.appendChild(cardEl);
-    });
-    
-    playerCardCount.textContent = `${gameState.playerHand.length} cards`;
-}
-
-// Render opponent's hand
-function renderOpponentHand() {
-    opponentCardsEl.innerHTML = '';
-    
-    // Show card backs (hidden)
-    gameState.aiHand.forEach(() => {
-        const cardEl = document.createElement('div');
-        cardEl.className = 'opponent-card';
-        opponentCardsEl.appendChild(cardEl);
-    });
-    
-    opponentCardCount.textContent = `${gameState.aiHand.length} cards`;
-}
-
-// Render discard pile
-function renderDiscardPile() {
-    const topCard = gameState.discardPile[gameState.discardPile.length - 1];
-    if (topCard) {
-        discardPileEl.innerHTML = '';
-        const cardEl = createCardElement(topCard, false);
-        cardEl.style.cursor = 'default';
-        cardEl.style.transform = 'scale(1.1)';
-        cardEl.style.transition = 'transform 0.3s ease';
-        discardPileEl.appendChild(cardEl);
-    }
-}
-
-// Create card element
-function createCardElement(card, isInteractive) {
-    const cardEl = document.createElement('div');
-    cardEl.className = `card ${card.color}`;
-    
-    let displayValue = card.value;
-    let displayType = card.type;
-    
-    if (card.value === 'skip') {
-        displayValue = '🚫';
-        displayType = 'Skip';
-    } else if (card.value === 'reverse') {
-        displayValue = '🔄';
-        displayType = 'Reverse';
-    } else if (card.value === 'draw2') {
-        displayValue = '+2';
-        displayType = 'Draw Two';
-    } else if (card.value === 'wild') {
-        displayValue = '🌈';
-        displayType = 'Wild';
-    } else if (card.value === 'wild4') {
-        displayValue = '+4';
-        displayType = 'Wild +4';
-    }
-    
-    cardEl.innerHTML = `
-        <div class="card-value">${displayValue}</div>
-        <div class="card-type">${displayType}</div>
-    `;
-    
-    return cardEl;
-}
-
-// Handle player card click
-function handlePlayerCardClick(card) {
-    if (gameState.currentTurn !== 'player' || !gameState.gameActive) return;
-    
-    if (!canPlayCard(card)) {
-        updateStatus(t('cantPlayCard'));
-        return;
-    }
-    
-    // Check UNO call
-    if (gameState.playerHand.length === 2 && !gameState.playerCalledUno) {
-        // Player forgot to call UNO - penalty
-        updateStatus(t('forgotUno'));
-        drawCards(2, true);
-        renderPlayerHand();
-    }
-    
-    gameState.playerCalledUno = false;
-    
-    if (card.type === 'wild') {
-        // Show color selection modal
-        showColorModal(card);
-    } else {
-        playCard(card, gameState.playerHand, true);
-        renderAll();
-        
-        if (gameState.gameActive) {
-            switchTurn();
-        }
-    }
-}
-
-// Show color selection modal
-function showColorModal(card) {
-    colorModal.classList.remove('hidden');
-    
-    document.querySelectorAll('.color-btn').forEach(btn => {
-        btn.onclick = () => {
-            const selectedColor = btn.dataset.color;
-            gameState.currentColor = selectedColor;
-            colorModal.classList.add('hidden');
-            
-            playCard(card, gameState.playerHand, true);
-            renderAll();
-            
-            if (gameState.gameActive) {
-                switchTurn();
-            }
-        };
-    });
-}
-
-// Handle draw deck click
-drawDeckEl.onclick = () => {
-    if (!gameState.gameActive) return;
-    if (gameState.currentTurn !== 'player') return;
-    
-    const drawnCard = drawCard();
-    if (drawnCard) {
-        gameState.playerHand.push(drawnCard);
-        renderPlayerHand();
-        
-        // Check if drawn card can be played
-        if (canPlayCard(drawnCard)) {
-            updateStatus("You drew a playable card!");
-        } else {
-            updateStatus("You drew a card. Pass turn.");
-            setTimeout(switchTurn, 1000);
-        }
-    }
-};
-
-// AI Turn
-function aiTurn() {
-    if (!gameState.gameActive || gameState.currentTurn !== 'ai') return;
-    
-    // Handle must draw cards
-    if (gameState.mustDrawCards > 0) {
-        drawCards(gameState.mustDrawCards, false);
-        renderOpponentHand();
-        switchTurn();
-        return;
-    }
-    
-    // Find playable cards
-    const playableCards = gameState.aiHand.filter(card => canPlayCard(card));
-    
-    if (playableCards.length > 0) {
-        let cardToPlay;
-        
-        // Different strategies based on difficulty
-        if (gameState.difficulty === 1) {
-            // Easy: Random choice
-            cardToPlay = playableCards[Math.floor(Math.random() * playableCards.length)];
-        } else if (gameState.difficulty === 2) {
-            // Medium: Prioritize action cards, then match color, then wild cards
-            playableCards.sort((a, b) => {
-                if (a.type === 'wild' && b.type !== 'wild') return 1;
-                if (a.type !== 'wild' && b.type === 'wild') return -1;
-                if (a.type === 'action' && b.type !== 'action') return -1;
-                if (a.type !== 'action' && b.type === 'action') return 1;
-                return 0;
-            });
-            cardToPlay = playableCards[0];
-        } else {
-            // Hard: Optimal strategy - save wild cards for emergencies, use action cards strategically
-            playableCards.sort((a, b) => {
-                // Prioritize action cards that hurt player
-                if (a.value === 'wild4' && b.value !== 'wild4') return 1;
-                if (a.value !== 'wild4' && b.value === 'wild4') return -1;
-                if (a.value === 'draw2' && b.value !== 'draw2') return -1;
-                if (a.value !== 'draw2' && b.value === 'draw2') return 1;
-                if (a.value === 'skip' && b.value !== 'skip') return -1;
-                if (a.value !== 'skip' && b.value === 'skip') return 1;
-                // Match color to keep options open
-                if (a.color === gameState.currentColor && b.color !== gameState.currentColor) return -1;
-                if (a.color !== gameState.currentColor && b.color === gameState.currentColor) return 1;
-                // Save wild cards
-                if (a.type === 'wild' && b.type !== 'wild') return 1;
-                if (a.type !== 'wild' && b.type === 'wild') return -1;
-                return 0;
-            });
-            cardToPlay = playableCards[0];
-        }
-        
-        if (cardToPlay.type === 'wild') {
-            // AI chooses color based on difficulty
-            if (gameState.difficulty === 1) {
-                // Easy: Random color
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                gameState.currentColor = randomColor;
-            } else if (gameState.difficulty === 2) {
-                // Medium: Most common color in hand
-                const colorCounts = { red: 0, blue: 0, green: 0, yellow: 0 };
-                gameState.aiHand.forEach(card => {
-                    if (card.color !== 'wild') colorCounts[card.color]++;
-                });
-                const bestColor = Object.entries(colorCounts).sort((a, b) => b[1] - a[1])[0][0];
-                gameState.currentColor = bestColor;
-            } else {
-                // Hard: Choose color AI has most of AND player likely doesn't
-                const colorCounts = { red: 0, blue: 0, green: 0, yellow: 0 };
-                gameState.aiHand.forEach(card => {
-                    if (card.color !== 'wild') colorCounts[card.color]++;
-                });
-                const bestColor = Object.entries(colorCounts).sort((a, b) => b[1] - a[1])[0][0];
-                gameState.currentColor = bestColor;
-            }
-        }
-        
-        playCard(cardToPlay, gameState.aiHand, false);
-        renderAll();
-        
-        // AI calls UNO
-        if (gameState.aiHand.length === 1) {
-            // Easy difficulty might forget to call UNO
-            if (gameState.difficulty === 1 && Math.random() > 0.7) {
-                updateStatus("AI forgot to call UNO!");
-            } else {
-                updateStatus("AI calls UNO!");
-            }
-        }
-        
-        if (gameState.gameActive) {
-            switchTurn();
-        }
-    } else {
-        // AI draws a card
-        const drawnCard = drawCard();
-        if (drawnCard) {
-            gameState.aiHand.push(drawnCard);
-            renderOpponentHand();
-            updateStatus("AI drew a card");
-            
-            // Hard difficulty: try to play drawn card if possible
-            if (gameState.difficulty === 3 && canPlayCard(drawnCard)) {
-                setTimeout(() => {
-                    if (gameState.currentTurn === 'ai' && gameState.gameActive) {
-                        aiTurn();
-                    }
-                }, 500);
-            }
-        }
-        
-        if (gameState.gameActive) {
-            switchTurn();
-        }
-    }
-}
-
-// UNO button click
-unoBtn.onclick = () => {
-    if (gameState.currentTurn === 'player') {
-        gameState.playerCalledUno = true;
-        unoBtn.classList.add('hidden');
-        updateStatus("You call UNO!");
-        closeCounterUnoWindow();
-    }
-};
-
-// Counter UNO button click
-counterUnoBtn.onclick = () => {
-    if (!gameState.counterUnoWindow) return;
-    updateStatus("Counter UNO! AI forgot to call UNO! Draw 2 cards!");
-    drawCards(2, false);
-    renderOpponentHand();
-    closeCounterUnoWindow();
-};
-
-// Open counter UNO window
-function openCounterUnoWindow() {
-    gameState.counterUnoWindow = true;
-    counterUnoBtn.classList.remove('hidden');
-    
-    // Close window after 3 seconds
-    gameState.counterUnoTimer = setTimeout(() => {
-        closeCounterUnoWindow();
-    }, 3000);
-}
-
-// Close counter UNO window
-function closeCounterUnoWindow() {
-    gameState.counterUnoWindow = false;
-    counterUnoBtn.classList.add('hidden');
-    if (gameState.counterUnoTimer) {
-        clearTimeout(gameState.counterUnoTimer);
-        gameState.counterUnoTimer = null;
-    }
-}
-
-// Render all game elements
-function renderAll() {
-    renderPlayerHand();
-    renderOpponentHand();
-    renderDiscardPile();
-    updateColorDisplay();
-}
-
-// Start game
-function startGame() {
-    gameState.deck = createDeck();
-    dealCards();
-    gameState.currentTurn = 'player';
-    gameState.direction = 1;
-    gameState.gameActive = true;
-    gameState.mustDrawCards = 0;
-    gameState.playerCalledUno = false;
-    
-    directionDisplay.textContent = '→';
-    unoBtn.classList.add('hidden');
-    opponentNameEl.textContent = '🤖 AI Opponent';
-    
-    renderAll();
-    updateTurnDisplay();
-    
-    const difficultyNames = { 1: 'Easy', 2: 'Medium', 3: 'Hard' };
-    updateStatus(`Game started! Difficulty: ${difficultyNames[gameState.difficulty]}. Your turn.`);
-}
-
-// End game
-function endGame(playerWon) {
-    gameState.gameActive = false;
-    
-    const winMessage = document.getElementById('win-message');
-    const winSubtitle = document.getElementById('win-subtitle');
-    
-    if (playerWon) {
-        winMessage.textContent = '🎉 You Win!';
-        winSubtitle.textContent = 'Congratulations!';
-    } else {
-        winMessage.textContent = '😢 AI Wins!';
-        winSubtitle.textContent = 'Better luck next time!';
-    }
-    
-    winModal.classList.remove('hidden');
-}
-
-// Reset game
-function resetGame() {
-    winModal.classList.add('hidden');
-    startGame();
-}
-
-// Back to menu
-function backToMenu() {
-    gameState.gameActive = false;
-    gameScreen.classList.add('hidden');
-    menuScreen.classList.remove('hidden');
-    winModal.classList.add('hidden');
-}
-
-// Event Listeners
-document.getElementById('play-ai-btn').onclick = () => {
-    menuScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    startGame();
-};
-
-document.getElementById('rules-btn').onclick = () => {
-    rulesModal.classList.remove('hidden');
-};
-
-document.getElementById('close-rules-btn').onclick = () => {
-    rulesModal.classList.add('hidden');
-};
-
-document.getElementById('back-to-menu-btn').onclick = backToMenu;
-
-document.getElementById('play-again-btn').onclick = resetGame;
-
-document.getElementById('back-to-menu-from-win-btn').onclick = backToMenu;
-
-// Difficulty button event listeners
-document.querySelectorAll('.difficulty-btn').forEach(btn => {
-    btn.onclick = () => {
-        // Remove active class from all buttons
-        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
-        // Add active class to clicked button
-        btn.classList.add('active');
-        // Set difficulty
-        gameState.difficulty = parseInt(btn.dataset.difficulty);
-    };
-});
-
-// Set default difficulty (Medium)
-document.querySelector('.difficulty-btn[data-difficulty="2"]').classList.add('active');
-
-// Language selector event listener
-document.getElementById('language-selector').addEventListener('change', (e) => {
-    switchLanguage(e.target.value);
-});
-
-// Background selector event listeners
-document.querySelectorAll('.bg-btn').forEach(btn => {
-    btn.onclick = () => {
-        // Remove active class from all buttons
-        document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
-        // Add active class to clicked button
-        btn.classList.add('active');
-        // Switch background
-        const bg = btn.dataset.bg;
-        document.body.className = '';
-        document.body.classList.add('bg-' + bg);
-        localStorage.setItem('uno_background', bg);
-    };
-});
-
-// Load saved language preference
-const savedLanguage = localStorage.getItem('uno_language');
-if (savedLanguage && translations[savedLanguage]) {
-    currentLanguage = savedLanguage;
-    document.getElementById('language-selector').value = savedLanguage;
-    updateAllText();
-}
-
-// Load saved background preference
-const savedBg = localStorage.getItem('uno_background');
-if (savedBg) {
-    document.body.className = '';
-    document.body.classList.add('bg-' + savedBg);
-    document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.querySelector(`.bg-btn[data-bg="${savedBg}"]`);
-    if (activeBtn) activeBtn.classList.add('active');
-} else {
-    document.body.classList.add('bg-default');
-}
-
-// Close modals on outside click
-colorModal.onclick = (e) => {
-    if (e.target === colorModal) colorModal.classList.add('hidden');
-};
-
-rulesModal.onclick = (e) => {
-    if (e.target === rulesModal) rulesModal.classList.add('hidden');
-};
-
-winModal.onclick = (e) => {
-    if (e.target === winModal) winModal.classList.add('hidden');
-};

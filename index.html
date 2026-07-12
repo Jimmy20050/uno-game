@@ -7,65 +7,116 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="screen">
-        <div class="login-container">
-            <h1 class="game-title">🎴 UNO</h1>
-            <p class="game-subtitle">Login to Play</p>
-            
-            <div class="auth-forms">
-                <div id="login-form" class="auth-form">
-                    <input type="text" id="login-username" class="auth-input" placeholder="Username">
-                    <input type="password" id="login-password" class="auth-input" placeholder="Password">
-                    <button id="login-btn" class="menu-btn primary">Login</button>
-                    <p class="auth-switch">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-                </div>
-                
-                <div id="signup-form" class="auth-form hidden">
-                    <input type="text" id="signup-username" class="auth-input" placeholder="Username">
-                    <input type="password" id="signup-password" class="auth-input" placeholder="Password">
-                    <input type="password" id="signup-confirm" class="auth-input" placeholder="Confirm Password">
-                    <button id="signup-btn" class="menu-btn primary">Sign Up</button>
-                    <p class="auth-switch">Already have an account? <a href="#" id="show-login">Login</a></p>
-                </div>
-            </div>
+    <!-- Top Navigation Menu -->
+    <div id="nav-menu-container" class="nav-menu-container">
+        <button id="nav-menu-btn" class="nav-menu-btn" title="Menu">
+            <span class="nav-menu-icon">☰</span>
+        </button>
+        <div id="nav-dropdown" class="nav-dropdown hidden">
+            <button class="nav-dropdown-item" data-nav="home" data-i18n="navHome">🏠 Home</button>
+            <button class="nav-dropdown-item" data-nav="players" data-i18n="navPlayers">👥 Players</button>
+            <button class="nav-dropdown-item" data-nav="rank" data-i18n="navRank">🏆 Rank</button>
+            <button class="nav-dropdown-item" data-nav="quit" data-i18n="navQuit">🚪 Quit Game</button>
         </div>
     </div>
 
     <!-- Main Menu Screen -->
-    <div id="menu-screen" class="screen hidden">
+    <div id="menu-screen" class="screen">
         <div class="menu-container">
             <h1 class="game-title">🎴 UNO</h1>
             <p class="game-subtitle">The Classic Card Game</p>
-            <p class="welcome-message">Welcome, <span id="current-username"></span>!</p>
             
             <div class="menu-buttons">
                 <button id="play-ai-btn" class="menu-btn primary">
                     <span class="btn-icon">🤖</span>
                     Play vs AI
                 </button>
-                <button id="play-multiplayer-btn" class="menu-btn secondary">
-                    <span class="btn-icon">👥</span>
-                    Local Multiplayer
-                </button>
                 <button id="rules-btn" class="menu-btn tertiary">
                     <span class="btn-icon">📖</span>
                     How to Play
                 </button>
-                <button id="logout-btn" class="menu-btn tertiary">
-                    <span class="btn-icon">🚪</span>
-                    Logout
-                </button>
             </div>
             
             <div class="difficulty-selection">
-                <p class="difficulty-label">Select Difficulty:</p>
+                <p class="difficulty-label" data-i18n="selectDifficulty">Select Difficulty:</p>
                 <div class="difficulty-buttons">
                     <button class="difficulty-btn" data-difficulty="1">Easy</button>
                     <button class="difficulty-btn" data-difficulty="2">Medium</button>
                     <button class="difficulty-btn" data-difficulty="3">Hard</button>
                 </div>
             </div>
+            
+            <div class="language-selection">
+                <p class="language-label" data-i18n="language">Language:</p>
+                <select id="language-selector" class="language-select">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="zh">中文</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
+            
+            <div class="music-selection">
+                <p class="music-label" data-i18n="musicLabel">🎵 Music:</p>
+                <div id="music-player" class="music-player"></div>
+            </div>
+            
+            <div class="background-selection">
+                <p class="background-label" data-i18n="backgroundLabel">Background:</p>
+                <div class="background-options">
+                    <button class="bg-btn bg-default active" data-bg="default" data-i18n-title="bgDefault" title="Night Sky"></button>
+                    <button class="bg-btn bg-wood" data-bg="wood" data-i18n-title="bgWood" title="Wood Table"></button>
+                    <button class="bg-btn bg-felt" data-bg="felt" data-i18n-title="bgFelt" title="Casino Felt"></button>
+                    <button class="bg-btn bg-beach" data-bg="beach" data-i18n-title="bgBeach" title="Beach"></button>
+                    <button class="bg-btn bg-forest" data-bg="forest" data-i18n-title="bgForest" title="Forest"></button>
+                    <button class="bg-btn bg-mountains" data-bg="mountains" data-i18n-title="bgMountains" title="Mountains"></button>
+                    <button class="bg-btn bg-space" data-bg="space" data-i18n-title="bgSpace" title="Deep Space"></button>
+                    <button class="bg-btn bg-stone" data-bg="stone" data-i18n-title="bgStone" title="Stone"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Players Page Screen -->
+    <div id="players-screen" class="screen hidden">
+        <div class="players-container">
+            <h1 class="players-page-title" data-i18n="playersGallery">👥 Players Gallery</h1>
+            <p class="players-page-subtitle" data-i18n="playersSubtitle">Pick your avatar and country, then see all available player icons</p>
+            
+            <div class="avatar-selection">
+                <p class="avatar-label" data-i18n="chooseAvatar">Choose Your Avatar:</p>
+                <div class="avatar-preview" id="avatar-preview">
+                    <span class="avatar-emoji">❓</span>
+                    <span class="avatar-preview-name" data-i18n="pickAvatar">Pick an avatar!</span>
+                </div>
+                <div class="avatar-grid" id="avatar-grid"></div>
+            </div>
+            
+            <div class="country-selection">
+                <p class="country-label" data-i18n="chooseCountry">Choose Your Country:</p>
+                <div class="country-preview" id="country-preview">
+                    <span class="country-flag">🏳️</span>
+                    <span class="country-preview-name" data-i18n="pickCountry">Pick your country!</span>
+                </div>
+                <div class="country-grid" id="country-grid"></div>
+            </div>
+            
+            <div id="players-gallery"></div>
+        </div>
+    </div>
+
+    <!-- Rank Page Screen -->
+    <div id="rank-screen" class="screen hidden">
+        <div class="rank-container">
+            <h1 class="rank-page-title" data-i18n="rankPageTitle">🏆 Your Rank</h1>
+            <p class="rank-page-subtitle" data-i18n="rankPageSubtitle">Win games to earn trophies and climb the ranks!</p>
+            <div id="rank-content"></div>
         </div>
     </div>
 
@@ -77,20 +128,27 @@
                 <span id="current-turn-display">Your Turn</span>
                 <span id="direction-display">→</span>
             </div>
-            <button id="uno-btn" class="uno-btn hidden">UNO!</button>
+            <button id="uno-btn" class="uno-btn hidden" style="display:none !important;">UNO!</button>
         </div>
 
         <!-- Opponent Area -->
         <div class="opponent-area">
             <div class="player-info">
+                <span class="player-avatar" id="ai-avatar">🤖</span>
+                <span class="player-flag" id="ai-flag"></span>
                 <span class="player-name" id="opponent-name">🤖 AI Opponent</span>
-                <span class="card-count" id="opponent-card-count">7 cards</span>
+                <span class="card-count" id="opponent-card-count" data-i18n-count="7" data-i18n="cards">7 cards</span>
             </div>
+            <button id="counter-uno-btn" class="counter-uno-btn hidden" style="display:none !important;">COUNTER UNO!</button>
             <div class="opponent-cards" id="opponent-cards"></div>
         </div>
 
         <!-- Game Center -->
         <div class="game-center">
+            <div class="current-color-indicator" id="current-color-indicator">
+                <span class="color-label" data-i18n="currentColorLabel">Current Color:</span>
+                <div class="color-display" id="color-display"></div>
+            </div>
             <div class="deck-area">
                 <div class="deck" id="draw-deck">
                     <div class="card-back"></div>
@@ -106,8 +164,10 @@
         <!-- Player Area -->
         <div class="player-area">
             <div class="player-info">
+                <span class="player-avatar" id="player-avatar">👤</span>
+                <span class="player-flag" id="player-flag"></span>
                 <span class="player-name">👤 You</span>
-                <span class="card-count" id="player-card-count">7 cards</span>
+                <span class="card-count" id="player-card-count" data-i18n-count="7" data-i18n="cards">7 cards</span>
             </div>
             <div class="player-cards" id="player-cards"></div>
         </div>
@@ -116,7 +176,7 @@
     <!-- Color Selection Modal -->
     <div id="color-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>Choose a Color</h2>
+            <h2 data-i18n="chooseColor">Choose a Color</h2>
             <div class="color-options">
                 <button class="color-btn red" data-color="red"></button>
                 <button class="color-btn blue" data-color="blue"></button>
@@ -129,7 +189,7 @@
     <!-- Rules Modal -->
     <div id="rules-modal" class="modal hidden">
         <div class="modal-content rules-content">
-            <h2>How to Play UNO</h2>
+            <h2 data-i18n="howToPlay">How to Play UNO</h2>
             <div class="rules-text">
                 <h3>🎯 Objective</h3>
                 <p>Be the first to play all your cards!</p>
@@ -152,22 +212,31 @@
                     <li>First to empty their hand wins!</li>
                 </ul>
             </div>
-            <button id="close-rules-btn" class="menu-btn primary">Got it!</button>
+            <button id="close-rules-btn" class="menu-btn primary" data-i18n="gotIt">Got it!</button>
         </div>
     </div>
 
     <!-- Win Modal -->
     <div id="win-modal" class="modal hidden">
         <div class="modal-content win-content">
-            <h2 id="win-message">🎉 You Win!</h2>
-            <p id="win-subtitle">Congratulations!</p>
+            <h2 id="win-message" data-i18n="youWin">🎉 You Win!</h2>
+            <p id="win-subtitle" data-i18n="congratulations">Congratulations!</p>
             <div class="win-buttons">
-                <button id="play-again-btn" class="menu-btn primary">Play Again</button>
-                <button id="back-to-menu-from-win-btn" class="menu-btn secondary">Main Menu</button>
+                <button id="play-again-btn" class="menu-btn primary" data-i18n="playAgain">Play Again</button>
+                <button id="back-to-menu-from-win-btn" class="menu-btn secondary" data-i18n="mainMenu">Main Menu</button>
             </div>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/avatars.js"></script>
+    <script src="js/ranks.js"></script>
+    <script src="js/music.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/gameLogic.js"></script>
+    <script src="js/aiLogic.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
